@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ececf0" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DUST" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <title>DUST</title>
+  <style>
+    :root{
+      --bg:#ececf0; --panel:rgba(255,255,255,.76); --panel-strong:#fff;
+      --text:#1d1d1f; --muted:#77777d; --line:rgba(60,60,67,.16);
+      --accent:#0a84ff; --danger:#ff453a; --shadow:0 12px 34px rgba(0,0,0,.08);
+      --radius:18px; --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
+    }
+    @media (prefers-color-scheme:dark){:root{
+      --bg:#111113; --panel:rgba(35,35,38,.78); --panel-strong:#252528;
+      --text:#f5f5f7; --muted:#98989f; --line:rgba(235,235,245,.13);
+      --accent:#0a84ff; --danger:#ff453a; --shadow:0 12px 38px rgba(0,0,0,.32);
+    }}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{background:var(--bg)}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+    button,input,textarea{font:inherit}
+    button{color:inherit}
+    .app{min-height:100vh;padding:calc(14px + var(--safe-top)) 14px calc(24px + var(--safe-bottom));max-width:780px;margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:20;padding:0 0 12px;background:linear-gradient(var(--bg) 70%,transparent)}
+    .windowbar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 10px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em;font-size:16px}
+    .dots{display:flex;gap:6px}.dot{width:10px;height:10px;border-radius:50%}.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+    .tiny{font-size:12px;color:var(--muted)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:rgba(118,118,128,.14);border-radius:12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .tab{border:0;background:transparent;border-radius:9px;padding:10px 8px;font-weight:700;font-size:14px;cursor:pointer}
+    .tab.active{background:var(--panel-strong);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+    .view{display:none}.view.active{display:block}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);overflow:hidden}
+    .section{padding:16px}.section+.section{border-top:1px solid var(--line)}
+    .label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
+    textarea{width:100%;min-height:190px;resize:vertical;border:0;outline:0;background:transparent;color:var(--text);font-size:15px;line-height:1.6;padding:0}
+    textarea::placeholder,input::placeholder{color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .btn{border:0;border-radius:11px;background:rgba(118,118,128,.16);padding:10px 14px;font-weight:700;cursor:pointer;min-height:40px}
+    .btn.primary{background:var(--accent);color:#fff}.btn.danger{color:var(--danger)}
+    .btn:active,.kaomoji:active{transform:scale(.98)}
+    .status{height:20px;margin-top:8px;font-size:12px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .toolbar input{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:11px 12px;outline:0}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    @media(min-width:560px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .kaomoji{position:relative;min-height:64px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:16px 10px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;overflow-wrap:anywhere;font-size:17px}
+    .kaomoji .controls{display:none;position:absolute;inset:auto 5px 5px 5px;gap:4px;justify-content:flex-end}
+    .editing .kaomoji{padding-bottom:38px}.editing .kaomoji .controls{display:flex}
+    .mini{border:0;background:rgba(118,118,128,.18);border-radius:8px;padding:5px 8px;cursor:pointer;font-size:12px}
+    .mini.del{color:var(--danger)}
+    .empty{grid-column:1/-1;padding:34px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+    .footnote{margin:12px 4px 0;color:var(--muted);font-size:12px;line-height:1.5}
+    dialog{border:1px solid var(--line);border-radius:18px;background:var(--panel-strong);color:var(--text);padding:0;max-width:min(92vw,420px);box-shadow:0 22px 70px rgba(0,0,0,.28)}
+    dialog::backdrop{background:rgba(0,0,0,.32);backdrop-filter:blur(3px)}
+    .modal{padding:18px}.modal h2{font-size:18px;margin:0 0 8px}.modal p{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 16px}
+    .modal .actions{justify-content:flex-end}
+    #fileInput{display:none}
+    .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-bottom));transform:translateX(-50%) translateY(14px);background:rgba(30,30,32,.9);color:white;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.18s;z-index:100;backdrop-filter:blur(16px)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="windowbar">
+        <div class="brand"><span class="dots"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i></span>DUST</div>
+        <span class="tiny">personal utility</span>
+      </div>
+      <nav class="tabs" aria-label="도구 탭">
+        <button class="tab active" data-tab="cleaner">HTML Cleaner</button>
+        <button class="tab" data-tab="kaomoji">Kaomoji</button>
+      </nav>
+    </div>
+
+    <section id="cleaner" class="view active">
+      <div class="card">
+        <div class="section">
+          <p class="label">Input</p>
+          <textarea id="htmlInput" placeholder="HTML이 섞인 텍스트를 붙여넣으세요"></textarea>
+          <div class="actions">
+            <button class="btn primary" id="cleanBtn">HTML 제거</button>
+            <button class="btn" id="clearBtn">초기화</button>
+          </div>
+        </div>
+        <div class="section">
+          <p class="label">Clean text</p>
+          <textarea id="htmlOutput" placeholder="정리된 텍스트가 여기에 표시됩니다" readonly></textarea>
+          <div class="actions"><button class="btn primary" id="copyCleanBtn">결과 복사</button></div>
+          <div class="status" id="cleanStatus"></div>
+        </div>
+      </div>
+      <p class="footnote">붙여넣기 시 클립보드의 HTML 형식이 있으면 자동으로 보이는 텍스트만 추출함</p>
+    </section>
+
+    <section id="kaomoji" class="view">
+      <div class="card">
+        <div class="section">
+          <p class="label">Kaomoji collection</p>
+          <div class="toolbar">
+            <input id="newKaomoji" type="text" placeholder="카오모지 추가" autocomplete="off" />
+            <button class="btn primary" id="addKaomojiBtn">추가</button>
+          </div>
+          <div class="actions" style="margin:0 0 12px">
+            <button class="btn" id="editBtn">편집</button>
+            <button class="btn" id="exportBtn">전체 내보내기</button>
+            <button class="btn" id="importBtn">전체 불러오기</button>
+            <input id="fileInput" type="file" accept="application/json,.json" />
+          </div>
+          <div class="grid" id="kaomojiGrid"></div>
+        </div>
+      </div>
+      <p class="footnote">카드를 누르면 즉시 복사됨 · 목록은 이 브라우저의 localStorage에 저장됨 · JSON 백업으로 전체 복원 가능</p>
+    </section>
+  </main>
+
+  <dialog id="importDialog">
+    <div class="modal">
+      <h2>카오모지 불러오기</h2>
+      <p>백업 파일의 목록으로 현재 목록을 교체하거나, 기존 목록 뒤에 합칠 수 있음</p>
+      <div class="actions">
+        <button class="btn" value="cancel" id="cancelImport">취소</button>
+        <button class="btn" id="mergeImport">기존 목록에 추가</button>
+        <button class="btn primary" id="replaceImport">전체 교체</button>
+      </div>
+    </div>
+  </dialog>
+  <div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY='dust_kaomojis_v1';
+let kaomojis=[];
+let editing=false;
+let pendingImport=null;
+
+const $=s=>document.querySelector(s);
+const toastEl=$('#toast');
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.classList.remove('show'),1300)}
+
+function normalizeText(s){
+  return s.replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function htmlToText(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  doc.querySelectorAll('script,style,noscript,template').forEach(el=>el.remove());
+  doc.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));
+  doc.querySelectorAll('p,div,li,tr,h1,h2,h3,h4,h5,h6,blockquote,pre').forEach(el=>el.append('\n'));
+  return normalizeText(doc.body.textContent||'');
+}
+function cleanPotentialHtml(raw){
+  if(!raw) return '';
+  const looksLikeHtml=/<\/?[a-z][\s\S]*?>/i.test(raw)||/&(?:nbsp|lt|gt|amp|quot|#\d+|#x[a-f0-9]+);/i.test(raw);
+  if(!looksLikeHtml) return normalizeText(raw);
+  return htmlToText(raw);
+}
+
+$('#htmlInput').addEventListener('paste',e=>{
+  const html=e.clipboardData?.getData('text/html');
+  if(!html) return;
+  e.preventDefault();
+  const plain=htmlToText(html);
+  const ta=e.currentTarget,start=ta.selectionStart,end=ta.selectionEnd;
+  ta.setRangeText(plain,start,end,'end');
+  $('#htmlOutput').value=cleanPotentialHtml(ta.value);
+  $('#cleanStatus').textContent='붙여넣기에서 HTML을 제거함';
+});
+$('#cleanBtn').onclick=()=>{const v=cleanPotentialHtml($('#htmlInput').value);$('#htmlOutput').value=v;$('#cleanStatus').textContent=v?'HTML 정리 완료':''};
+$('#clearBtn').onclick=()=>{$('#htmlInput').value='';$('#htmlOutput').value='';$('#cleanStatus').textContent=''};
+$('#copyCleanBtn').onclick=async()=>{const v=$('#htmlOutput').value;if(!v)return toast('복사할 결과 없음');await navigator.clipboard.writeText(v);toast('복사됨')};
+
+function loadKaomojis(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));kaomojis=Array.isArray(saved)?saved.filter(x=>typeof x==='string'):[]}catch{kaomojis=[]}}
+function saveKaomojis(){localStorage.setItem(STORAGE_KEY,JSON.stringify(kaomojis))}
+function renderKaomojis(){
+  const grid=$('#kaomojiGrid');grid.classList.toggle('editing',editing);grid.textContent='';
+  if(!kaomojis.length){const e=document.createElement('div');e.className='empty';e.textContent='아직 저장된 카오모지가 없음';grid.appendChild(e);return}
+  kaomojis.forEach((k,i)=>{
+    const card=document.createElement('button');card.type='button';card.className='kaomoji';
+    const text=document.createElement('span');text.textContent=k;card.appendChild(text);
+    const controls=document.createElement('div');controls.className='controls';
+    [['↑',-1],['↓',1]].forEach(([label,dir])=>{const b=document.createElement('button');b.type='button';b.className='mini';b.textContent=label;b.onclick=e=>{e.stopPropagation();moveKaomoji(i,dir)};controls.appendChild(b)});
+    const del=document.createElement('button');del.type='button';del.className='mini del';del.textContent='삭제';del.onclick=e=>{e.stopPropagation();kaomojis.splice(i,1);saveKaomojis();renderKaomojis()};controls.appendChild(del);
+    card.appendChild(controls);
+    card.onclick=async()=>{if(editing)return;await navigator.clipboard.writeText(k);toast('카오모지 복사됨')};
+    grid.appendChild(card);
+  })
+}
+function moveKaomoji(i,dir){const ni=i+dir;if(ni<0||ni>=kaomojis.length)return;[kaomojis[i],kaomojis[ni]]=[kaomojis[ni],kaomojis[i]];saveKaomojis();renderKaomojis()}
+function addKaomoji(){const input=$('#newKaomoji'),v=input.value.trim();if(!v)return;if(kaomojis.includes(v))return toast('이미 있음');kaomojis.push(v);saveKaomojis();input.value='';renderKaomojis();toast('추가됨')}
+$('#addKaomojiBtn').onclick=addKaomoji;$('#newKaomoji').addEventListener('keydown',e=>{if(e.key==='Enter')addKaomoji()});
+$('#editBtn').onclick=()=>{editing=!editing;$('#editBtn').textContent=editing?'편집 완료':'편집';renderKaomojis()};
+$('#exportBtn').onclick=()=>{
+  const data={app:'DUST',version:1,exportedAt:new Date().toISOString(),kaomojis};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`dust-kaomoji-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);toast('백업 파일 저장됨');
+};
+$('#importBtn').onclick=()=>$('#fileInput').click();
+$('#fileInput').onchange=async e=>{
+  const file=e.target.files?.[0];e.target.value='';if(!file)return;
+  try{const data=JSON.parse(await file.text());const list=Array.isArray(data)?data:data.kaomojis;if(!Array.isArray(list)||!list.every(x=>typeof x==='string'))throw 0;pendingImport=list;$('#importDialog').showModal()}catch{toast('올바른 DUST 백업 파일이 아님')}
+};
+$('#cancelImport').onclick=()=>{$('#importDialog').close();pendingImport=null};
+$('#replaceImport').onclick=()=>{kaomojis=[...pendingImport];saveKaomojis();renderKaomojis();$('#importDialog').close();pendingImport=null;toast('전체 복원 완료')};
+$('#mergeImport').onclick=()=>{kaomojis=[...kaomojis,...pendingImport.filter(x=>!kaomojis.includes(x))];saveKaomojis();renderKaomojis();$('#importDialog').close();pendingImport=null;toast('목록 합치기 완료')};
+
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===btn.dataset.tab));});
+
+loadKaomojis();renderKaomojis();
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+</script>
+</body>
+</html>
