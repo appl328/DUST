@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#ececf0" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -25,6 +25,7 @@
       --accent:#0a84ff; --danger:#ff453a; --shadow:0 12px 38px rgba(0,0,0,.32);
     }}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{touch-action:manipulation}
     html{background:var(--bg)}
     body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
     button,input,textarea{font:inherit}
@@ -42,7 +43,7 @@
     .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);overflow:hidden}
     .section{padding:16px}.section+.section{border-top:1px solid var(--line)}
     .label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
-    textarea{width:100%;min-height:190px;resize:vertical;border:0;outline:0;background:transparent;color:var(--text);font-size:15px;line-height:1.6;padding:0}
+    textarea{width:100%;min-height:190px;resize:vertical;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;line-height:1.6;padding:0}
     textarea::placeholder,input::placeholder{color:var(--muted)}
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     .btn{border:0;border-radius:11px;background:rgba(118,118,128,.16);padding:10px 14px;font-weight:700;cursor:pointer;min-height:40px}
@@ -165,13 +166,17 @@ function cleanPotentialHtml(raw){
 
 $('#htmlInput').addEventListener('paste',e=>{
   const html=e.clipboardData?.getData('text/html');
+  $('#htmlOutput').value='';
+  $('#cleanStatus').textContent='';
   if(!html) return;
   e.preventDefault();
   const plain=htmlToText(html);
   const ta=e.currentTarget,start=ta.selectionStart,end=ta.selectionEnd;
   ta.setRangeText(plain,start,end,'end');
-  $('#htmlOutput').value=cleanPotentialHtml(ta.value);
-  $('#cleanStatus').textContent='붙여넣기에서 HTML을 제거함';
+});
+$('#htmlInput').addEventListener('input',()=>{
+  $('#htmlOutput').value='';
+  $('#cleanStatus').textContent='';
 });
 $('#cleanBtn').onclick=()=>{const v=cleanPotentialHtml($('#htmlInput').value);$('#htmlOutput').value=v;$('#cleanStatus').textContent=v?'HTML 정리 완료':''};
 $('#clearBtn').onclick=()=>{$('#htmlInput').value='';$('#htmlOutput').value='';$('#cleanStatus').textContent=''};
