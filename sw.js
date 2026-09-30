@@ -1,4 +1,4 @@
-const CACHE='dust-v3-artist-tags-20261001';
+const CACHE='dust-v4-mobile-cards-20261001';
 const ASSETS=['./','./index.html','./artist-tags.html','./manifest.webmanifest','./favicon-48.png','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./samples/female.json','./samples/male.json'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('dust-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

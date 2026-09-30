@@ -116,7 +116,6 @@ th .why { cursor:pointer; }
 
 /* DUST system surfaces and touch-sized controls */
 :root,:root[data-theme="light"]{color-scheme:light;--bg:#ececf0;--bg2:#fff;--bg3:#e5e5ea;--line:rgba(60,60,67,.16);--line2:#b8b8c0;--fg:#1d1d1f;--fg2:#66666e;--fg3:#66666e;--accent:#0a84ff;--accent-dim:#85bfff;--r:12px}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#111113;--bg2:#252528;--bg3:#343438;--line:rgba(235,235,245,.13);--line2:#55555e;--fg:#f5f5f7;--fg2:#aaaab2;--fg3:#aaaab2;--accent:#0a84ff;--accent-dim:#31669e}
 html,body{touch-action:manipulation}body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}
 .top{padding:12px 4px;gap:8px;position:static;background:transparent}.brand{font-size:14px}.brand small{display:block;margin:0}
 main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}button,.btn{min-height:44px}.btn{display:inline-flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--line);font-weight:600;padding:9px 12px;border-radius:11px}
@@ -124,6 +123,25 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
 .source{margin:0 0 12px;color:var(--fg2);font-size:12px}.source summary{cursor:pointer;min-height:32px;display:flex;align-items:center}.source summary::before{content:"＋";margin-right:6px}.source[open] summary::before{content:"−"}.source #sourceInfo{padding:0 0 8px}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.stat{padding:10px}.stat b{font-size:20px}.stat:last-child:nth-child(odd){grid-column:span 2}.stat .why{width:24px;height:24px;min-height:24px;margin-left:0}.stat span{font-size:11px}.panel .cards{grid-template-columns:repeat(2,minmax(0,1fr))}.panel .stat:last-child:nth-child(odd){grid-column:1/-1}
 @media(min-width:600px){.cards{grid-template-columns:repeat(5,minmax(0,1fr))}.stat:last-child:nth-child(odd){grid-column:auto}.stat b{font-size:20px}}
 @media(max-width:420px){.brand{width:100%}.grow{display:none}.panel{border-radius:18px 18px 0 0;top:10px}.panel .cards{grid-template-columns:1fr 1fr}.top{padding-top:4px}}
+
+.mobile-sort,.mobile-glossary{display:none}
+@media(max-width:600px){
+ .brand{display:none}.top{padding:4px 4px 12px;border-bottom:0}.grow{display:none}#q{width:0;flex:1}.controls{margin-bottom:8px}.source{margin-bottom:8px}
+ .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.stat{padding:8px}.stat b{font-size:18px}.stat span{font-size:10px}.stat .why{height:22px;min-height:22px;width:22px}
+ .mobile-glossary{display:block;margin:8px 0 12px;font-size:12px;color:var(--fg2)}.mobile-glossary summary{min-height:32px;cursor:pointer}#mobileTerms{display:flex;flex-wrap:wrap;gap:8px}#mobileTerms span{display:inline-flex;align-items:center}
+ .mobile-sort{display:flex;gap:8px;align-items:center;margin-bottom:12px}.mobile-sort label{font-size:12px;color:var(--fg2)}.mobile-sort select{flex:1;width:0}.mobile-sort .btn{font-size:12px;padding:8px}
+ #body>.tablescroll{max-height:none;min-height:0;overflow:visible;border:0;background:none}
+ #tbl,#tbl tbody{display:block;width:100%}#tbl thead{display:none}
+ #rows{display:grid!important;gap:10px}#rows tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px}
+ #rows td{border:0;padding:0;min-width:0;text-align:left;font-size:14px;overflow-wrap:anywhere}
+ #rows td::before{content:attr(data-label);display:block;color:var(--fg2);font-size:11px;margin-bottom:3px}
+ #rows td:nth-child(2){grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:6px}#rows td:nth-child(2)::before{display:none}
+ #rows td:first-child,#rows td:nth-child(n+7){display:none}
+ #rows .tag{width:100%;overflow-wrap:anywhere;min-height:36px;font-size:16px;padding:0}#rows .tiny{font-size:11px}
+ .panel{width:100%;max-width:100%;border-radius:14px 14px 0 0;top:0;padding:14px}.panel code{overflow-wrap:anywhere}.panel .tag{overflow-wrap:anywhere;max-width:100%;padding:0}
+ .panel .tablescroll{max-height:none!important;overflow:visible;border:0;background:none}.panel table,.panel tbody{display:block;width:100%}.panel thead{display:none}.panel tbody{display:grid;gap:8px}.panel tbody tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;background:var(--bg);border-radius:12px}.panel td{min-width:0;overflow-wrap:anywhere;text-align:left;padding:0;border:0}.panel td:first-child{grid-column:1/-1}.panel td:not(:first-child)::before{content:attr(data-label);display:block;font-size:10px;color:var(--fg2);margin-bottom:3px}.panel .cards{grid-template-columns:1fr 1fr}
+ .pager{padding-bottom:16px}.pager span{text-align:center}
+}
 </style>
 </head>
 <body>
@@ -133,7 +151,6 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
   <span class="grow"></span>
   <input id="q" type="search" placeholder="작가 검색" hidden>
   <label class="btn" id="pickWrap" hidden>다른 파일<input type="file" id="pick2" accept=".json,.csv" hidden></label>
-  <button class="btn" id="theme" title="밝게/어둡게">◐</button>
 </header>
 
 <div class="controls"><select id="sample" aria-label="샘플 통계 데이터"><option value="">샘플 데이터 선택</option><option value="female">여성향 위주 · 188장</option><option value="male">남성향 위주 · 2,228장</option></select><button class="btn" id="loadSample">샘플 열기</button></div>
@@ -150,6 +167,8 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
     <details class="source"><summary>데이터 출처·집계 정보</summary><div id="sourceInfo"></div></details>
     <div class="cards" id="cards"></div>
     <p class="muted tiny" id="count"></p>
+    <details class="mobile-glossary"><summary>통계 용어 설명</summary><div id="mobileTerms"></div></details>
+    <div class="mobile-sort"><label for="mobileSort">정렬</label><select id="mobileSort"><option value="count">등장 횟수</option><option value="tag">작가 이름</option><option value="share">비율</option><option value="weight_mean">평균 가중치</option><option value="weight_median">중앙값</option><option value="weight_iqr">사분위폭</option><option value="weight_mode">최빈 가중치</option><option value="rank">원본 순서</option></select><button class="btn" id="sortDirection">내림차순</button></div>
     <div class="tablescroll">
       <table id="tbl">
         <thead><tr>
@@ -182,7 +201,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let DATA = null, sort = { k: 'count', dir: -1 };
 let page=0, filteredCount=0, returnFocus=null, readToken=0; const PAGE_SIZE=100;
-document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+
 
 /* ---------------------------------------------------------------- 읽기 */
 function parseCsv(text) {
@@ -298,6 +317,7 @@ function renderRows() {
   let list = DATA.artists.filter(a => !q ||
     a.tag.toLowerCase().includes(q) || (a.nai_input || '').toLowerCase().includes(q) || (a.korean || '').toLowerCase().includes(q));
   const k = sort.k;
+  $('#mobileSort').value=k; $('#sortDirection').textContent=sort.dir<0?'내림차순':'오름차순';
   list = [...list];
   if (k === 'tag') list.sort((a, b) => a.tag.localeCompare(b.tag) * sort.dir);
   else if (k === 'rank' && sort.dir < 0) list.reverse();
@@ -340,6 +360,8 @@ function renderRows() {
           Math.round(a.weight_mode_rate * 100)}%</span>` : ''}</td>
     </tr>`;
   }).join('');
+  const labels=['순번','작가','등장','비율','평균 가중치','중앙값','분포','사분위폭','최빈'];
+  $ ('#rows').querySelectorAll('tr').forEach(row=>[...row.cells].forEach((cell,i)=>cell.dataset.label=labels[i]));
 }
 
 function openArtist(tag) {
@@ -361,7 +383,7 @@ function openArtist(tag) {
     </div>
     <p class="tiny muted">평균 ${a.weight_mean ?? '—'} · 표준편차 ${a.weight_sd ?? '—'} ·
       범위 ${a.weight_min ?? '—'}~${a.weight_max ?? '—'}${
-      a.weight_mode != null ? ` · 최빈 ${a.weight_mode}` : ''}</p>
+      a.weight_mode != null ? ` · 사분위폭 ${a.weight_iqr ?? '—'} · 최빈 ${a.weight_mode}${a.weight_mode_rate!=null?' ('+Math.round(a.weight_mode_rate*100)+'%)':''}` : ''}</p>
     <div class="sect">함께 쓰인 작가 ${ps.length}명</div>
     ${ps.length ? `<div class="tablescroll" style="max-height:52vh"><table>
         <thead><tr><th><span class="nosort">작가</span></th>
@@ -375,6 +397,7 @@ function openArtist(tag) {
         <p class="tiny muted">리프트는 전체 평균 대비 몇 배로 함께 나오는지입니다.
           1이면 무관. 함께 나온 수가 작으면 우연일 수 있습니다.</p>`
       : '<p class="muted tiny">동시출현 자료가 없습니다. (CSV 만 읽었거나 표본이 적습니다)</p>'}`;
+  $('#panel').querySelectorAll('tbody tr').forEach(row=>[...row.cells].forEach((cell,i)=>cell.dataset.label=['작가','함께 등장','P(B|A)','리프트'][i]));
   $('#panel').hidden = false; $('#panelBack').hidden=false;
   $('#px').onclick = closePanel; $('#px').focus();
 }
@@ -393,11 +416,9 @@ document.addEventListener('drop', e => {
 });
 $('#pick').onchange = e => e.target.files[0] && readFile(e.target.files[0]);
 $('#pick2').onchange = e => e.target.files[0] && readFile(e.target.files[0]);
+$('#mobileSort').onchange=e=>{sort={k:e.target.value,dir:['tag','rank'].includes(e.target.value)?1:-1};page=0;renderRows();};
+$('#sortDirection').onclick=()=>{sort.dir*=-1;page=0;renderRows();};
 $('#q').oninput = () => {page=0;renderRows();};
-$('#theme').onclick = () => {
-  const el = document.documentElement;
-  el.dataset.theme = el.dataset.theme === 'light' ? 'dark' : 'light';
-};
 document.addEventListener('click', e => {
   const t = e.target.closest('.tag');
   if (t && DATA) openArtist(t.dataset.artist);
@@ -535,6 +556,7 @@ document.addEventListener('keydown',e=>{
  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
+$('#mobileTerms').innerHTML=['등장','비율','평균','중앙값','분포','사분위폭','최빈','함께','PBA','리프트'].map(k=>`<span>${esc(TERMS[k][0])}${whyBtn(k)}</span>`).join('');
 window.__viewer = { accept, parseCsv, syncTopHeight, loadFromUrl, applyHash,
                     get data() { return DATA; } };
 </script>
