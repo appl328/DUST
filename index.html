@@ -36,7 +36,7 @@
     .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em;font-size:16px}
     .dots{display:flex;gap:6px}.dot{width:10px;height:10px;border-radius:50%}.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
     .tiny{font-size:12px;color:var(--muted)}
-    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:rgba(118,118,128,.14);border-radius:12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;background:rgba(118,118,128,.14);border-radius:12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
     .tab{border:0;background:transparent;border-radius:9px;padding:10px 8px;font-weight:700;font-size:14px;cursor:pointer}
     .tab.active{background:var(--panel-strong);box-shadow:0 1px 4px rgba(0,0,0,.12)}
     .view{display:none}.view.active{display:block}
@@ -68,6 +68,10 @@
     #fileInput{display:none}
     .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-bottom));transform:translateX(-50%) translateY(14px);background:rgba(30,30,32,.9);color:white;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.18s;z-index:100;backdrop-filter:blur(16px)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    input,select,textarea{font-size:16px}
+    .tab{min-height:44px;font-size:13px;padding:10px 3px}
+    #artistFrame{display:block;width:100%;height:calc(100dvh - 140px);min-height:480px;border:0;border-radius:18px;background:var(--bg)}
+    @media(max-width:380px){.app{padding-left:8px;padding-right:8px}.tab{font-size:12px}}
   </style>
 </head>
 <body>
@@ -80,6 +84,7 @@
       <nav class="tabs" aria-label="도구 탭">
         <button class="tab active" data-tab="cleaner">HTML Cleaner</button>
         <button class="tab" data-tab="kaomoji">Kaomoji</button>
+        <button class="tab" data-tab="artists">Artist Tags</button>
       </nav>
     </div>
 
@@ -121,6 +126,9 @@
         </div>
       </div>
       <p class="footnote">카드를 누르면 즉시 복사됨 · 목록은 이 브라우저의 localStorage에 저장됨 · JSON 백업으로 전체 복원 가능</p>
+    </section>
+    <section id="artists" class="view" aria-label="작가 태그 통계">
+      <iframe id="artistFrame" src="./artist-tags.html" title="작가 태그 통계 뷰어"></iframe>
     </section>
   </main>
 
