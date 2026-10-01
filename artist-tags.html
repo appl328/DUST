@@ -125,9 +125,9 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
 @media(max-width:420px){.brand{width:100%}.grow{display:none}.panel{border-radius:18px 18px 0 0;top:10px}.panel .cards{grid-template-columns:1fr 1fr}.top{padding-top:4px}}
 
 .mobile-sort,.mobile-glossary{display:none}
-@media(max-width:600px){
+@media all{
  .brand{display:none}.top{padding:4px 4px 12px;border-bottom:0}.grow{display:none}#q{width:0;flex:1}.controls{margin-bottom:8px}.source{margin-bottom:8px}
- .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.stat{padding:8px}.stat b{font-size:18px}.stat span{font-size:10px}.stat .why{height:22px;min-height:22px;width:22px}
+ .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.cards .stat:last-child:nth-child(odd){grid-column:span 2}.stat{padding:8px}.stat b{font-size:18px}.stat span{font-size:10px}.stat .why{height:22px;min-height:22px;width:22px}
  .mobile-glossary{display:block;margin:8px 0 12px;font-size:12px;color:var(--fg2)}.mobile-glossary summary{min-height:32px;cursor:pointer}#mobileTerms{display:flex;flex-wrap:wrap;gap:8px}#mobileTerms span{display:inline-flex;align-items:center}
  .mobile-sort{display:flex;gap:8px;align-items:center;margin-bottom:12px}.mobile-sort label{font-size:12px;color:var(--fg2)}.mobile-sort select{flex:1;width:0}.mobile-sort .btn{font-size:12px;padding:8px}
  #body>.tablescroll{max-height:none;min-height:0;overflow:visible;border:0;background:none}
