@@ -1,5 +1,5 @@
-const CACHE='dust-v8-navigation-ascii-20261006';
-const ASSETS=['./','./index.html','./artist-tags.html','./ascii-studio.html','./artist-plus.js','./artist-plus.css','./manifest.webmanifest','./favicon-48.png','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./samples/female.json','./samples/male.json'];
+const CACHE='dust-v9-local-stats-20261006';
+const ASSETS=['./','./index.html','./artist-tags.html','./ascii-studio.html','./artist-plus.js','./artist-plus.css','./manifest.webmanifest','./favicon-48.png','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('dust-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{

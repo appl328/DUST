@@ -142,6 +142,7 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
  .panel .tablescroll{max-height:none!important;overflow:visible;border:0;background:none}.panel table,.panel tbody{display:block;width:100%}.panel thead{display:none}.panel tbody{display:grid;gap:8px}.panel tbody tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;background:var(--bg);border-radius:12px}.panel td{min-width:0;overflow-wrap:anywhere;text-align:left;padding:0;border:0}.panel td:first-child{grid-column:1/-1}.panel td:not(:first-child)::before{content:attr(data-label);display:block;font-size:10px;color:var(--fg2);margin-bottom:3px}.panel .cards{grid-template-columns:1fr 1fr}
  .pager{padding-bottom:16px}.pager span{text-align:center}
 }
+.local-storage{align-items:center;justify-content:space-between}.local-storage span{font-size:12px;color:var(--fg2);overflow-wrap:anywhere;min-width:0;flex:1}.local-storage button{font-size:12px}
 </style>
 </head>
 <body>
@@ -153,12 +154,12 @@ main{padding:0 4px 12px}input,select{font-size:16px;min-height:44px;min-width:0}
   <label class="btn" id="pickWrap" hidden>다른 파일<input type="file" id="pick2" accept=".json,.csv" hidden></label>
 </header>
 
-<div class="controls"><select id="sample" aria-label="샘플 통계 데이터"><option value="">샘플 데이터 선택</option><option value="female">여성향 위주 · 188장</option><option value="male">남성향 위주 · 2,228장</option></select><button class="btn" id="loadSample">샘플 열기</button></div>
+<div class="controls local-storage"><span id="storageStatus" role="status">내 통계 파일을 불러오세요</span><button class="btn" id="clearStored" hidden>저장 데이터 삭제</button></div>
 <p class="err tiny" id="err" role="alert"></p>
 <main>
   <div class="drop" id="drop">
     <h1>통계 파일을 여기에 놓으세요</h1>
-    <p class="muted tiny">JSON 과 CSV 를 읽습니다.</p>
+    <p class="muted tiny">내 기기의 JSON 또는 CSV를 선택하세요.<br>마지막으로 불러온 파일은 이 브라우저에 저장됩니다.<br>파일은 서버로 전송되지 않습니다.</p>
     <label class="btn">파일 고르기<input type="file" id="pick" accept=".json,.csv" hidden></label>
 
   </div>
@@ -243,7 +244,7 @@ function parseCsv(text) {
            artists, artistPairs: {} };
 }
 
-function accept(obj) {
+function validateData(obj) {
   if (!obj || !Array.isArray(obj.artists)) throw new Error('작가 통계 파일이 아닙니다');
   if (obj.format && obj.format !== 'nai5-artist-stats') {
     throw new Error(`모르는 형식입니다: ${obj.format}`);
@@ -253,6 +254,9 @@ function accept(obj) {
   if(obj.artists.some(a=>!a || typeof a.tag!=='string' || !a.tag.trim() || numeric.some(k=>a[k]!=null && (typeof a[k]!=='number'||!Number.isFinite(a[k]))))) throw new Error('작가 통계 필드 형식이 올바르지 않습니다');
   if(obj.artists.some(a=>['nai_input','korean'].some(k=>a[k]!=null && typeof a[k]!=='string'))) throw new Error('작가 이름 형식이 올바르지 않습니다');
   if(obj.artistPairs && (Array.isArray(obj.artistPairs)||typeof obj.artistPairs!=='object'||Object.values(obj.artistPairs).some(ps=>!Array.isArray(ps)||ps.some(p=>!p||typeof p.partner!=='string'||['together','p_given','lift'].some(k=>typeof p[k]!=='number'||!Number.isFinite(p[k])))))) throw new Error('동시출현 정보 형식이 올바르지 않습니다');
+}
+function accept(obj) {
+  validateData(obj);
   page=0; $('#q').value=''; closePanel(); hideTip();
   DATA = obj;
   DATA.artistPairs = DATA.artistPairs || {};
@@ -264,8 +268,20 @@ async function readFile(file) {
   try {
     const text = (await file.text()).replace(/^\uFEFF/,'');
     if(token!==readToken)return;
-    accept(/\.csv$/i.test(file.name) || !text.trim().startsWith('{')
-      ? parseCsv(text) : JSON.parse(text));
+    const obj=/\.csv$/i.test(file.name) || !text.trim().startsWith('{') ? parseCsv(text) : JSON.parse(text);
+    validateData(obj);
+    await queueStorage(async()=>{
+      if(token!==readToken)return;
+      try{
+        await savedData('put',{name:file.name,data:obj});
+        if(token!==readToken)return;
+        accept(obj); showStorage(file.name,true);
+      }catch(e){
+        if(token!==readToken)return;
+        accept(obj); showStorage(file.name,false);
+        $('#err').textContent='브라우저에 저장하지 못했습니다 · 현재 화면에서만 표시됨 · 원본 파일을 보관해 주세요';
+      }
+    });
   } catch (e) {
     if(token===readToken) $('#err').textContent = `${file.name}: ${e.message}`;
   }
@@ -518,37 +534,10 @@ syncTopHeight();
 addEventListener('resize', syncTopHeight);
 if (window.ResizeObserver) new ResizeObserver(syncTopHeight).observe(document.querySelector('.top'));
 
-/* 주소에 ?src=파일이름 을 붙이면 그 파일을 바로 엽니다.
-   같은 폴더의 파일만 봅니다 (다른 주소를 넣어도 따라가지 않습니다). */
-async function loadFromUrl() {
-  const src = new URLSearchParams(location.search).get('src');
-  if (!src) return;
-  const target=new URL(src,location.href); const folder=new URL('./',location.href);
-  if (target.origin!==folder.origin || !target.pathname.startsWith(folder.pathname) || target.pathname.slice(folder.pathname.length).includes('/')) {
-    $('#err').textContent = '같은 폴더의 파일만 열 수 있습니다.';
-    return;
-  }
-  try {
-    const res = await fetch(target.href,{redirect:"error"});
-    if (!res.ok) throw new Error(`${res.status}`);
-    const text = await res.text();
-    accept(/\.csv$/i.test(src) || !text.trim().startsWith('{') ? parseCsv(text) : JSON.parse(text));
-  } catch (e) {
-    $('#err').textContent = `${src}: ${e.message}`;
-  }
-}
-loadFromUrl();
 function closePanel(){ $('#panel').hidden=true; $('#panelBack').hidden=true; if(returnFocus?.isConnected)returnFocus.focus(); returnFocus=null; }
 $('#panelBack').onclick=closePanel;
 $('#prev').onclick=()=>{page--;renderRows();$('.tablescroll').scrollTop=0;};
 $('#next').onclick=()=>{page++;renderRows();$('.tablescroll').scrollTop=0;};
-$('#loadSample').onclick=async()=>{
- const name=$('#sample').value;if(!name){$('#err').textContent='샘플 데이터를 먼저 선택하세요';return;}
- const token=++readToken; $('#err').textContent=''; $('#loadSample').textContent='읽는 중…';
- try{const res=await fetch('./samples/'+name+'.json');if(!res.ok)throw new Error('파일을 읽지 못했습니다');const obj=await res.json();if(token===readToken)accept(obj);}
- catch(e){if(token===readToken)$('#err').textContent=e.message;}
- finally{$('#loadSample').textContent='샘플 열기';}
-};
 for(const id of ['pick','pick2']) $(('#'+id)).onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readFile(f);};
 document.addEventListener('keydown',e=>{
  if(e.key!=='Tab'||$('#panel').hidden)return;
@@ -557,7 +546,34 @@ document.addEventListener('keydown',e=>{
  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
 $('#mobileTerms').innerHTML=['등장','비율','평균','중앙값','분포','사분위폭','최빈','함께','PBA','리프트'].map(k=>`<span>${esc(TERMS[k][0])}${whyBtn(k)}</span>`).join('');
-window.__viewer = { accept, parseCsv, syncTopHeight, loadFromUrl, applyHash,
+
+let storageQueue=Promise.resolve();
+function queueStorage(action){const result=storageQueue.then(action);storageQueue=result.catch(()=>{});return result;}
+const statsDB=new Promise((resolve,reject)=>{
+ const req=indexedDB.open('dust_artist_stats_v1:'+new URL('./',location.href).pathname,1);
+ req.onupgradeneeded=()=>req.result.createObjectStore('current');
+ req.onsuccess=()=>{req.result.onversionchange=()=>req.result.close();resolve(req.result);};
+ req.onerror=()=>reject(req.error);
+ req.onblocked=()=>reject(new Error('저장소가 다른 창에서 사용 중입니다'));
+});
+statsDB.catch(()=>{});
+async function savedData(action,value){const db=await statsDB;return new Promise((resolve,reject)=>{
+ const tx=db.transaction('current',action==='get'?'readonly':'readwrite'),store=tx.objectStore('current');let req;
+ if(action==='get')req=store.get('last');
+ else if(action==='put')req=store.put(value,'last');
+ else req=store.delete('last');
+ tx.oncomplete=()=>resolve(req.result);tx.onabort=()=>reject(tx.error||new Error('저장 실패'));tx.onerror=()=>{};
+});}
+function showStorage(name,saved){$('#storageStatus').textContent=name+' · '+(saved?'이 브라우저에 저장됨':'이번에만 표시됨');$('#clearStored').hidden=false;}
+$('#clearStored').onclick=async()=>{
+ if(!confirm('이 브라우저에 저장한 작가 통계 데이터를 삭제할까요? 원본 파일과 Artist Tags + 보관함은 유지됩니다.'))return;
+ const token=++readToken;
+ try{await queueStorage(async()=>{await savedData('delete');if(token!==readToken)return;closePanel();hideTip();DATA=null;$('#body').hidden=true;$('#drop').hidden=false;$('#q').hidden=$('#pickWrap').hidden=true;$('#q').value='';$('#clearStored').hidden=true;$('#err').textContent='';$('#storageStatus').textContent='내 통계 파일을 불러오세요';});}
+ catch(e){$('#err').textContent='저장 데이터 삭제 실패 · 다시 시도해 주세요';}
+};
+(async()=>{const token=readToken;try{const saved=await savedData('get');if(token!==readToken||!saved)return;accept(saved.data);showStorage(saved.name,true);}catch(e){if(token===readToken)$('#err').textContent='저장 데이터를 복원하지 못했습니다 · 파일을 직접 불러와 주세요';}})();
+
+window.__viewer = { accept, parseCsv, syncTopHeight, applyHash,
                     get data() { return DATA; } };
 </script>
 </body>
