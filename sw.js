@@ -1,5 +1,5 @@
-const CACHE='dust-v5-all-cards-20261001';
-const ASSETS=['./','./index.html','./artist-tags.html','./manifest.webmanifest','./favicon-48.png','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./samples/female.json','./samples/male.json'];
+const CACHE='dust-v7-artist-plus-20261006';
+const ASSETS=['./','./index.html','./artist-tags.html','./ascii-studio.html','./artist-plus.js','./artist-plus.css','./manifest.webmanifest','./favicon-48.png','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./samples/female.json','./samples/male.json'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('dust-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
@@ -16,7 +16,7 @@ self.addEventListener('fetch',e=>{
       const saved=await cache.match(e.request);
       if(saved)return saved;
       if(e.request.mode==='navigate'){
-        const fallback=await cache.match(url.pathname.endsWith('/artist-tags.html')?'./artist-tags.html':'./index.html');
+        const fallback=await cache.match(url.pathname.endsWith('/ascii-studio.html')?'./ascii-studio.html':url.pathname.endsWith('/artist-tags.html')?'./artist-tags.html':'./index.html');
         if(fallback)return fallback;
       }
       return new Response('Offline: file unavailable',{status:503,headers:{'Content-Type':'text/plain;charset=utf-8'}});
