@@ -68,7 +68,8 @@
     #artistFrame,#asciiFrame{display:block;width:100%;height:calc(100dvh - 140px);min-height:480px;border:0;border-radius:18px;background:var(--bg)}
     @media(max-width:380px){.app{padding-left:8px;padding-right:8px}.tab{font-size:12px}}
     .char-count{font-size:12px;color:var(--muted);margin:0 0 12px;font-variant-numeric:tabular-nums}
-    @media(max-width:480px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.tabs .tab:last-child{grid-column:1/-1}#artistFrame,#asciiFrame{height:calc(100dvh - 232px);min-height:400px}}
+    .app:has(#ascii.active){max-width:1100px}
+    @media(max-width:759px){.tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scroll-padding:4px;-webkit-overflow-scrolling:touch}.tabs .tab{flex:0 0 auto;min-width:100px;padding:10px 14px;white-space:nowrap}.tabs .tab:last-child{grid-column:auto}#artistFrame,#asciiFrame{height:calc(100dvh - 140px);min-height:400px}}
   </style>
 </head>
 <body>
@@ -237,7 +238,7 @@ $('#cancelImport').onclick=()=>{$('#importDialog').close();pendingImport=null};
 $('#replaceImport').onclick=()=>{kaomojis=[...pendingImport];saveKaomojis();renderKaomojis();$('#importDialog').close();pendingImport=null;toast('전체 복원 완료')};
 $('#mergeImport').onclick=()=>{kaomojis=[...kaomojis,...pendingImport.filter(x=>!kaomojis.includes(x))];saveKaomojis();renderKaomojis();$('#importDialog').close();pendingImport=null;toast('목록 합치기 완료')};
 
-document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===btn.dataset.tab));});
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===btn.dataset.tab));const nav=btn.parentElement;if(nav.scrollWidth>nav.clientWidth){const left=btn.offsetLeft-nav.offsetLeft;nav.scrollTo({left:Math.max(0,left-(nav.clientWidth-btn.offsetWidth)/2),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}});
 
 const graphemes=new Intl.Segmenter('ko',{granularity:'grapheme'});
 function countText(text){return [...graphemes.segment(text.replace(/\r\n?/g,'\n'))].length;}
