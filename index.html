@@ -11,6 +11,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
   <title>DUST</title>
+  <link rel="stylesheet" href="./ooc.css">
   <style>
     :root{color-scheme:light;
       --bg:#ececf0; --panel:rgba(255,255,255,.76); --panel-strong:#fff;
@@ -30,7 +31,7 @@
     .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em;font-size:16px}
     .dots{display:flex;gap:6px}.dot{width:10px;height:10px;border-radius:50%}.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
     .tiny{font-size:12px;color:var(--muted)}
-    .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;background:rgba(118,118,128,.14);border-radius:12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;background:rgba(118,118,128,.14);border-radius:12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
     .tab{border:0;background:transparent;border-radius:9px;padding:10px 8px;font-weight:700;font-size:14px;cursor:pointer}
     .tab.active{background:var(--panel-strong);box-shadow:0 1px 4px rgba(0,0,0,.12)}
     .view{display:none}.view.active{display:block}
@@ -82,6 +83,7 @@
         <button class="tab active" data-tab="cleaner">HTML Cleaner</button>
         <button class="tab" data-tab="kaomoji">Kaomoji</button>
         <button class="tab" data-tab="ascii">ASCII Studio</button>
+        <button class="tab" data-tab="ooc">OOC</button>
       </nav>
     </div>
 
@@ -127,8 +129,10 @@
     <section id="ascii" class="view" aria-label="아스키아트 메이커">
       <iframe id="asciiFrame" src="./ascii-studio.html" title="ASCII Studio 아스키아트 메이커" allow="clipboard-write"></iframe>
     </section>
-    <p class="footnote"><a href="./migration.html">이전 작가 데이터 내보내기</a></p>
+    <section id="ooc" class="view" aria-label="OOC 보관함"><div class="ooc-head"><h1>OOC</h1><div class="ooc-actions"><button id="oocAdd" class="btn primary">새 OOC</button><button id="oocExport" class="btn">전체 내보내기</button><button id="oocImport" class="btn">전체 불러오기</button><input id="oocFile" type="file" accept=".json,application/json" hidden></div></div><input id="oocSearch" type="search" class="ooc-search" placeholder="제목·내용 검색" aria-label="OOC 제목과 내용 검색"><p id="oocCount" class="ooc-note" aria-live="polite"></p><p id="oocError" class="ooc-error" role="alert"></p><div id="oocGrid" class="ooc-grid"></div><p class="ooc-note">내용은 두 줄 미리보기 · 카드를 누르면 전체 내용 확인·수정 · 이 브라우저에 저장됨</p></section>
   </main>
+  <dialog id="oocEditor" class="ooc-dialog"><form id="oocForm" class="ooc-form"><h2 id="oocEditorTitle">새 OOC</h2><label for="oocTitle">제목</label><input id="oocTitle" maxlength="200" required autocomplete="off"><label for="oocContent">내용</label><textarea id="oocContent" maxlength="100000" required></textarea><p id="oocEditError" class="ooc-error" role="alert"></p><div class="actions"><button id="oocDelete" type="button" class="btn danger" hidden>삭제</button><button id="oocCancel" type="button" class="btn">취소</button><button type="submit" class="btn primary">저장</button></div></form></dialog>
+  <dialog id="oocImportDialog" class="ooc-dialog"><div class="ooc-form"><h2>OOC 불러오기</h2><p id="oocImportSummary" class="ooc-note"></p><p class="ooc-note">추가는 이미 등록된 항목을 유지함 · 전체 교체는 현재 OOC 모두를 백업 내용으로 바꿈</p><div class="actions"><button id="oocImportCancel" class="btn">취소</button><button id="oocMerge" class="btn">기존 목록에 추가</button><button id="oocReplace" class="btn danger">전체 교체</button></div></div></dialog>
   <dialog id="importDialog">
     <div class="modal">
       <h2>카오모지 불러오기</h2>
@@ -238,5 +242,6 @@ updateCounts();
 loadKaomojis();renderKaomojis();
 if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
+<script src="./ooc.js"></script>
 </body>
 </html>
