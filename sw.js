@@ -1,4 +1,4 @@
-const CACHE='dust-ooc-v2.1-20261022-'+self.registration.scope;
+const CACHE='dust-ooc-v2.1.1-20261026-'+self.registration.scope;
 const ASSETS=["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-48.png", "./ascii-studio.html", "./ooc.js", "./ooc.css"];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const key of await caches.keys()){if(key===CACHE||!key.startsWith('dust-'))continue;const old=await caches.open(key);if(await old.match(new URL('./index.html',self.registration.scope).href))await caches.delete(key);}await self.clients.claim();})()));
